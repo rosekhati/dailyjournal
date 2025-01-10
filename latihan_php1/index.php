@@ -111,22 +111,38 @@ include "koneksi.php";
   <!-- article end -->
   <!-- gallery begin -->
   <section id="gallery" class="text-center p-5 bg-danger-subtle">
+  <style>
+    .carousel-img {
+      width: 100%;
+      height: 1000px; /* Sesuaikan tinggi carousel */
+      object-fit: cover; /* Pastikan gambar tetap penuh */
+      object-position: center; /* Pusatkan gambar */
+    }
+  </style>
     <div class="container">
-      <h1 class="fw-bold display-4 pb-3">gallery</h1>
+      <h1 class="fw-bold display-4 pb-3">Gallery</h1>
       <div id="carouselExample" class="carousel slide">
         <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="img/gal1.jpg" class="d-block w-100" alt="..." />
-          </div>
-          <div class="carousel-item">
-            <img src="img/gal2.jpg" class="d-block w-100" alt="..." />
-          </div>
-          <div class="carousel-item">
-            <img src="img/gal4.jpg" class="d-block w-100" alt="..." />
-          </div>
-          <div class="carousel-item">
-            <img src="img/gal5.jpg" class="d-block w-100" alt="..." />
-          </div>
+          <?php
+          $sql = "SELECT * FROM gallery ORDER BY tanggal DESC";
+          $hasil = $conn->query($sql);
+          $isFirst = true;
+
+          while ($row = $hasil->fetch_assoc()) {
+            $activeClass = $isFirst ? 'active' : '';
+            $isFirst = false;
+            ?>
+            <div class="carousel-item <?= $activeClass ?>">
+              <img src="img/<?= $row["gambar"] ?>" class="d-block w-100 img-fluid carousel-img object-fit-cover img" alt="Gallery Image">
+              <div class="card-footer">
+                <small class="text-body-secondary">
+                  <strong><?= $row["tanggal"] ?></strong>
+                </small>
+              </div>
+            </div>
+            <?php
+          }
+          ?>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>

@@ -1,50 +1,58 @@
 <?php
-function upload_foto($File)
+function upload_foto($File, $mode = 'add', $oldFile = null)
 {
     $uploadOk = 1;
     $hasil = array();
     $message = '';
 
-    //File properties:
+    // File properties:
     $FileName = $File['name'];
     $TmpLocation = $File['tmp_name'];
     $FileSize = $File['size'];
 
-    //Figure out what kind of file this is:
+    // Determine file extension:
     $FileExt = explode('.', $FileName);
     $FileExt = strtolower(end($FileExt));
 
-    //Allowed files:
+    // Allowed file types:
     $Allowed = array('jpg', 'png', 'gif', 'jpeg');
 
     // Check file size
     if ($FileSize > 500000) {
-        $message .= "Sorry, your file is too large, max 500KB. ";
+        $message .= "File terlalu besar, maksimal 500KB. ";
         $uploadOk = 0;
     }
 
     // Allow certain file formats
     if (!in_array($FileExt, $Allowed)) {
-        $message .= "Sorry, only JPG, JPEG, PNG & GIF files are allowed. ";
+        $message .= "Hanya file JPG, JPEG, PNG & GIF yang diperbolehkan. ";
         $uploadOk = 0;
     }
 
-    // Check if $uploadOk is set to 0 by an error
+    // If an error occurred
     if ($uploadOk == 0) {
-        $message .= "Sorry, your file was not uploaded. ";
+        $message .= "File tidak diunggah. ";
         $hasil['status'] = false;
-        // if everything is ok, try to upload file
     } else {
-        //Create new filename:
+        // Generate new file name:
         $NewName = date("YmdHis") . '.' . $FileExt;
         $UploadDestination = "img/" . $NewName;
 
+        // Replace mode: Remove old file if exists
+        if ($mode === 'replace' && $oldFile) {
+            $oldFilePath = "img/" . $oldFile;
+            if (file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
+        }
+
+        // Move new file to destination
         if (move_uploaded_file($TmpLocation, $UploadDestination)) {
-            //echo "The file has been uploaded.";
             $message .= $NewName;
             $hasil['status'] = true;
+            $hasil['file_name'] = $NewName;
         } else {
-            $message .= "Sorry, there was an error uploading your file. ";
+            $message .= "Terjadi kesalahan saat mengunggah file. ";
             $hasil['status'] = false;
         }
     }
